@@ -1,0 +1,69 @@
+:root {
+  --bg-dark: #050510;       /* Deep space blue/black */
+  --bg-panel: #0f1020;      /* Slightly lighter panel bg */
+  
+  --primary: #00f0ff;       /* Cyberpunk Cyan */
+  --primary-dim: rgba(0, 240, 255, 0.1);
+  
+  --secondary: #7000ff;     /* Neon Purple */
+  --accent: #ff0055;        /* Neon Pink/Red */
+  
+  --text-main: #ffffff;
+  --text-mute: #94a3b8;
+  
+  --glass-border: rgba(255,255,255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+a { 
+  text-decoration: none; 
+  color: inherit; 
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #fff 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

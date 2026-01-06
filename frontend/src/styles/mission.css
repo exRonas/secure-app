@@ -1,0 +1,485 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+/* --- TACTICAL TABLE SCENE (BLUE THEME) --- */
+.mission-scene {
+  width: 100%;
+  height: calc(100vh - 64px); /* Full height minus navbar */
+  perspective: 1200px;
+  background: radial-gradient(circle at center, #050a14 0%, #000000 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Share Tech Mono', monospace;
+  color: #aaddff;
+}
+
+/* CRT Scanline Effect */
+.mission-scene::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 10;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* The Table Itself - RESPONSIVE */
+.tactical-table {
+  width: 90%;
+  max-width: 1200px;
+  height: 65vh; /* Occupy significant vertical space */
+  background-color: rgba(5, 10, 20, 0.85);
+  
+  /* Blue Grid */
+  background-image: 
+      linear-gradient(#004455 1px, transparent 1px),
+      linear-gradient(90deg, #004455 1px, transparent 1px);
+  background-size: 50px 50px;
+  
+  border: 2px solid #005577;
+  box-shadow: 0 0 80px rgba(0, 200, 255, 0.15);
+  
+  /* 3D Transform */
+  transform: rotateX(50deg) rotateZ(0deg); 
+  transform-style: preserve-3d;
+  position: relative;
+  transition: all 0.5s ease;
+  margin-top: 20px;
+}
+
+/* Decorative Framing */
+.tactical-table::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 10px solid rgba(0, 50, 80, 0.4);
+  pointer-events: none;
+}
+
+/* Mission Points */
+.mission-point {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Positions */
+.pos-0 { top: 65%; left: 20%; }
+.pos-1 { top: 30%; left: 50%; }
+.pos-2 { top: 60%; left: 80%; }
+
+/* Base Marker (Ring on ground) */
+.base-marker {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 60px; height: 60px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 255, 255, 0.05);
+  border: 2px dashed #00aaff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  animation: radar-pulse 3s infinite linear;
+}
+
+.mission-point.locked .base-marker {
+  border-color: #ff3333;
+  background: rgba(255, 0, 0, 0.05);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+  border-style: solid;
+}
+
+.mission-point.completed .base-marker {
+  border-color: #00ff88;
+  background: rgba(0, 255, 100, 0.05);
+  box-shadow: 0 0 15px rgba(0, 255, 100, 0.2);
+}
+
+/* Connector Beam */
+.connector-line {
+  position: absolute;
+  top: 0; left: 0;
+  width: 2px;
+  height: 80px; /* Floating height */
+  background: linear-gradient(to top, rgba(0,255,255,0) 0%, #00aaff 100%);
+  transform-origin: bottom center;
+  transform: rotateX(-90deg) translateZ(0); 
+  /* Note: rotateX(-90deg) makes it stand up from the flat table */
+}
+
+.mission-point.locked .connector-line { 
+  background: linear-gradient(to top, rgba(255,0,0,0) 0%, #ff3333 100%);
+}
+.mission-point.completed .connector-line {
+  background: linear-gradient(to top, rgba(0,255,100,0) 0%, #00ff88 100%);
+}
+
+/* Floating Icon */
+.floating-icon {
+  position: absolute;
+  left: -28px; 
+  top: -28px;
+  width: 56px;
+  height: 56px;
+  
+  /* Raise above table and face camera */
+  /* Since table is rotateX(50deg), we need rotateX(-50deg) to face user roughly, 
+     but we also translated Z. Let's use the logic from table.html */
+  transform: translateZ(80px) rotateX(-50deg);
+  
+  background: rgba(0, 15, 30, 0.9);
+  border: 1px solid #00aaff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ccffff;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.3);
+  animation: float-vertical 3s ease-in-out infinite;
+  
+  /* Sci-fi shape */
+  clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+  transition: all 0.3s;
+}
+
+.mission-point.locked .floating-icon {
+  border-color: #ff3333;
+  color: #ff3333;
+  box-shadow: 0 0 10px rgba(255, 50, 50, 0.3);
+}
+
+.mission-point.completed .floating-icon {
+  border-color: #00ff88;
+  color: #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 100, 0.4);
+}
+
+/* INFO PANEL (Hover) */
+.mission-info {
+  position: absolute;
+  width: 220px;
+  left: 35px; /* Offset from icon */
+  bottom: 0; /* Align with bottom of connector */
+  
+  /* 3D positioning to float with icon */
+  transform: translateZ(80px) rotateX(-50deg);
+  
+  background: rgba(0, 5, 10, 0.95);
+  border-left: 3px solid #00aaff;
+  padding: 10px;
+  font-size: 13px;
+  color: #aaddff;
+  
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.mission-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  color: #00ffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mission-point.locked .mission-info { border-left-color: #ff3333; }
+.mission-point.locked .mission-info h3 { color: #ff3333; }
+
+/* HOVER STATES */
+.mission-point:hover .floating-icon {
+  background: rgba(0, 40, 60, 1);
+  border-color: #ffffff;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+  transform: translateZ(90px) rotateX(-50deg) scale(1.1);
+  z-index: 100;
+}
+
+.mission-point:hover .base-marker {
+  border-color: #ffffff;
+  background: rgba(0, 255, 255, 0.15);
+}
+
+.mission-point:hover .mission-info {
+  opacity: 1;
+}
+
+/* ANIMATIONS */
+@keyframes radar-pulse {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+@keyframes float-vertical {
+  0%, 100% { transform: translateZ(80px) rotateX(-50deg); }
+  50% { transform: translateZ(95px) rotateX(-50deg); }
+}
+
+/* TITLE OVERLAY */
+.tactical-title {
+  position: absolute;
+  top: 20px;
+  right: auto;
+  left: auto;
+  border: 1px solid #00aaff;
+  padding: 8px 30px;
+  background: rgba(0, 20, 40, 0.85);
+  color: #00aaff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 20px rgba(0, 150, 255, 0.2);
+}
+
+/* HUD PANEL */
+.hud-panel {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(to top, rgba(0, 10, 25, 0.95), transparent);
+  border-top: 1px solid rgba(0, 170, 255, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 20;
+}
+
+.hud-objective-label {
+  font-size: 12px; color: #0088aa; margin-bottom: 5px; text-transform: uppercase;
+}
+.hud-objective-title {
+  font-size: 22px; letter-spacing: 3px; color: #e0f0ff; text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+}
+.hud-objective-desc {
+  font-size: 14px; color: #5599bb; margin-top: 5px;
+}
+
+/* WORKSPACE LAYOUT OVERRIDES */
+.workspace-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #020408;
+}
+
+.workspace-header {
+  background: #050a14;
+  border-bottom: 1px solid #112233;
+  color: #aaddff;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.back-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.workspace-content {
+  padding: 20px;
+  overflow: auto; /* Allow scrolling if content is too large */
+  flex: 1; /* Take up remaining vertical space */
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  position: relative;
+}
+
+/* --- 3D ROTATING LOGO COMPONENT --- */
+.logo-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+  filter: drop-shadow(0 0 10px rgba(0, 170, 255, 0.3));
+  transform: scale(0.8); /* Slightly smaller for fitting */
+}
+
+.cube-scene {
+  width: 100px;
+  height: 100px;
+  transform-style: preserve-3d;
+  animation: spin-cube 10s infinite linear;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.face {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border: 2px solid #00aaff;
+  background: rgba(0, 30, 60, 0.15);
+  box-shadow: 0 0 15px rgba(0, 170, 255, 0.1) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: rgba(0, 255, 255, 0.5);
+}
+
+.face::after {
+  content: '';
+  position: absolute;
+  top: 5px; left: 5px; right: 5px; bottom: 5px;
+  border: 1px dashed rgba(0, 170, 255, 0.3);
+}
+
+.face.front  { transform: rotateY(0deg) translateZ(50px); }
+.face.back   { transform: rotateY(180deg) translateZ(50px); }
+.face.right  { transform: rotateY(90deg) translateZ(50px); }
+.face.left   { transform: rotateY(-90deg) translateZ(50px); }
+.face.top    { transform: rotateX(90deg) translateZ(50px); }
+.face.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+.inner-lock {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: counter-spin 10s infinite linear; 
+  z-index: 10;
+}
+
+.lock-icon-svg {
+  width: 40px;
+  height: 40px;
+  fill: #aaddff;
+  filter: drop-shadow(0 0 5px #00aaff);
+}
+
+.ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top: 2px solid #00aaff;
+  border-bottom: 2px solid #00aaff;
+  pointer-events: none;
+}
+
+.ring-1 {
+  width: 140px; height: 140px;
+  margin-top: -70px; margin-left: -70px;
+  animation: ring-spin 4s infinite linear reverse;
+  opacity: 0.6;
+}
+
+.ring-2 {
+  width: 160px; height: 160px;
+  margin-top: -80px; margin-left: -80px;
+  border: 1px dashed #00aaff; 
+  animation: ring-spin 15s infinite linear;
+  opacity: 0.3;
+}
+
+@keyframes spin-cube {
+  0% { transform: rotateX(-15deg) rotateY(0deg); }
+  100% { transform: rotateX(-15deg) rotateY(360deg); }
+}
+
+@keyframes counter-spin {
+  0% { transform: translate(-50%, -50%) rotateY(360deg); }
+  100% { transform: translate(-50%, -50%) rotateY(0deg); }
+}
+
+@keyframes ring-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- BRIEFING LAYOUT --- */
+.briefing-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  max-width: 1000px;
+  width: 100%;
+}
+
+.briefing-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.briefing-content {
+  flex: 1.5;
+  background: rgba(5, 15, 30, 0.8);
+  border: 1px solid #005577;
+  padding: 30px;
+  position: relative;
+}
+
+.briefing-content::before {
+  content: "СОВЕРШЕННО СЕКРЕТНО // ЛИЧНО В РУКИ";
+  position: absolute;
+  top: -10px; left: 20px;
+  background: #020408;
+  padding: 0 10px;
+  color: #ff3333;
+  font-size: 10px;
+  letter-spacing: 2px;
+  border: 1px solid #331111;
+}
+
+.briefing-title {
+  font-size: 24px;
+  color: #00ffff;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #004455;
+  padding-bottom: 10px;
+}
+
+.briefing-text {
+  font-size: 14px;
+  color: #aaddff;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.start-mission-btn {
+  background: rgba(0, 170, 255, 0.1);
+  border: 1px solid #00aaff;
+  color: #00aaff;
+  padding: 10px 30px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Share Tech Mono', monospace;
+  transition: all 0.3s;
+}
+
+.start-mission-btn:hover {
+  background: #00aaff;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+}
+
+
+.cursor-blink { animation: blink 1s step-end infinite; color: var(--primary); font-weight: bold; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
