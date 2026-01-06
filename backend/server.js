@@ -3,6 +3,7 @@ const express = require('express');
 const helmet = require('helmet');
 const session = require('express-session');
 const cors = require('cors');
+const path = require('path');
 const { apiLimiter } = require('./middleware/rateLimit');
 
 const app = express();
@@ -47,7 +48,13 @@ app.use(session({
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/lab', require('./routes/mission')); // New Mission/Target Routes
 
-app.get('/', (req, res) => res.send('Secure Academy API v2.0'));
+// 7. SERVE STATIC FILES (PRODUCTION)
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Handle React Routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Secure Backend active on port ${PORT}`);

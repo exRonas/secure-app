@@ -11,7 +11,8 @@ export const AuthProvider = ({ children }) => {
 
   // Setup Axios with Credentials for Cookies
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    // In production (served by backend), use relative path. In dev, use explicit localhost:5000
+    baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:5000/api',
     withCredentials: true 
   });
 
