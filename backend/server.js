@@ -48,12 +48,29 @@ app.use(session({
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/lab', require('./routes/mission')); // New Mission/Target Routes
 
+const fs = require('fs');
+
 // 7. SERVE STATIC FILES (PRODUCTION)
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+const frontendPath = path.join(__dirname, '../frontend/dist');
+console.log('Static files path:', frontendPath);
+
+if (fs.existsSync(frontendPath)) {
+  console.log('✅ Frontend build found!');
+} else {
+  console.error('❌ Frontend build NOT found at:', frontendPath);
+  console.error('   Please run "npm run build" in the frontend directory.');
+}
+
+app.use(express.static(frontendPath));
 
 // Handle React Routing, return all requests to React app
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+  } else {
+      res.status(404).send('Secure Academy: Frontend build not found. Please run "npm run build" on the server.');
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
